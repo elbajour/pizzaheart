@@ -221,7 +221,7 @@
         <span class="l2">HEART</span>
       </p>
       <div class="tagline">YOUR HEART'S FAVOURITE PIZZA</div>
-      <p class="sub">من العجينة الطازة للصوص المتظبط على الآخر — بيتزا هارت بتقدملك الطعم اللي بيرجعلك كل مرة. اطلب دلوقتي واستناه سخن على السريع.</p>
+      <p class="sub">بيتزا معمولة بكل حب، وطعم يخلي كل لقمة ليها مكان في قلبك. اختار من المنيو واطلب دلوقتي</p>
       <div class="cta-row">
         <button class="btn btn-primary" onclick="smartOrderClick()">🍕 ORDER NOW</button>
         <a href="#menu" class="btn btn-outline">شوف المنيو</a>
@@ -239,7 +239,7 @@
 
 <div class="strip">
   <div class="wrap">
-    <div>🕒 التوصيل من <b>10 الصبح</b> لحد <b>2 بالليل</b></div>
+    <div>🕒 التوصيل من <b>9 الصبح</b> لحد <b>3 بالليل</b></div>
     <div>📍 أمام المحكمة – ش دكتور ظريف – أمام فخفخينا</div>
     <div>🔥 أكتر من <b>60 صنف</b> على المنيو</div>
   </div>
@@ -270,12 +270,11 @@
       <span class="kicker">آراء عملائنا</span>
       <h2>WHAT OUR CUSTOMERS SAY ❤️</h2>
     </div>
-    <div class="review-grid">
-      <div class="review-card reveal"><div class="stars">★★★★★</div><p>"البيتزا تحفة والخدمة ممتازة، والتوصيل بيوصل سخن دايمًا."</p><div class="who">— عميل من المنطقة</div></div>
-      <div class="review-card reveal"><div class="stars">★★★★★</div><p>"بيتزا هارت بقت أول اختيار عندنا، خصوصًا برجر هارت والكريب."</p><div class="who">— عميلة دايمة</div></div>
-      <div class="review-card reveal"><div class="stars">★★★★☆</div><p>"طعم مميز وأسعار كويسة، ونفسي يزودوا أصناف أكتر في السي فود."</p><div class="who">— عميل جديد</div></div>
+    <div class="review-grid" id="reviewGrid"></div>
+    <div style="text-align:center;margin-top:26px;">
+      <button class="btn btn-outline" onclick="openReviewModal()">✍️ ضيف تقييمك</button>
     </div>
-    <p class="reviews-note">* دي نماذج تقييمات مبدئية — ممكن نستبدلها بتقييمات حقيقية من عملائكم أول ما تتجمع.</p>
+    <p class="reviews-note">* التقييمات دي بيضيفها العملاء بنفسهم من الموقع، وبتتحفظ على المتصفح/الجهاز اللي اتفتح منه الموقع.</p>
   </div>
 </section>
 
@@ -321,7 +320,7 @@
         <div class="ic-wrap">🛵</div>
         <h4>DELIVERY</h4>
         <p>Available الآن</p>
-        <small>10 صباحًا – 2 بعد نص الليل</small>
+        <small>9 صباحًا – 3 بعد نص الليل</small>
       </div>
     </div>
   </div>
@@ -357,6 +356,19 @@
     <a class="modal-opt" href="tel:01043658291">📞 اتصال — 01043658291</a>
     <a class="modal-opt" href="tel:01130801190">📞 اتصال — 01130801190</a>
     <button class="modal-close" onclick="closeOrderModal()">إلغاء</button>
+  </div>
+</div>
+
+<!-- Add review modal -->
+<div class="modal-overlay" id="reviewModalOverlay">
+  <div class="modal">
+    <h3>ضيف تقييمك</h3>
+    <p>رأيك بيفرق معانا ومع اللي جايين بعدك</p>
+    <div id="starPicker" style="font-size:1.8rem;letter-spacing:6px;margin-bottom:16px;color:var(--panel-line);cursor:pointer;"></div>
+    <input id="reviewName" type="text" placeholder="اسمك (اختياري)" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--panel-line);background:var(--bg-2);color:var(--cream);font-family:inherit;margin-bottom:12px;font-size:.92rem;">
+    <textarea id="reviewText" rows="3" placeholder="اكتب رأيك في الأكل والخدمة..." style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--panel-line);background:var(--bg-2);color:var(--cream);font-family:inherit;margin-bottom:16px;font-size:.92rem;resize:vertical;"></textarea>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="submitReview()">إرسال التقييم</button>
+    <button class="modal-close" onclick="closeReviewModal()">إلغاء</button>
   </div>
 </div>
 
@@ -415,7 +427,7 @@ const MENU = [
     ["المكسيكي",135],["شيش",130],["برجر",120],["مكس المزاج",140],
     ["بطاطس",55],["ميكس جبن",100],["كريب هارت",160],
   ]},
-  { id:"sandwiches", label:"ساندوتشات", emoji:"🥙", cols:null, items:[
+  { id:"sandwiches", label:"ساندويتشات سوري", emoji:"🥙", cols:null, items:[
     ["شاورما فراخ سوري",80],["شاورما لحم",110],["شاورما بطاطس",95],
     ["موتزريلا فراخ سوري",95],["بطاطس سوري",45],["بطاطس موتزريلا سوري",70],["ميكس سوري",100],
   ]},
@@ -432,22 +444,13 @@ let cart = []; // { key, name, catLabel, size, price, qty }
 const tabsEl = document.getElementById('tabs');
 const panelsEl = document.getElementById('panels');
 
-MENU.forEach((cat, i) => {
-  const tab = document.createElement('button');
-  tab.className = 'tab' + (i===0 ? ' active' : '');
-  tab.textContent = cat.emoji + ' ' + cat.label;
-  tab.dataset.id = cat.id;
-  tab.onclick = () => selectTab(cat.id);
-  tabsEl.appendChild(tab);
-
-  const panel = document.createElement('div');
-  panel.className = 'menu-panel' + (i===0 ? ' active' : '');
-  panel.id = 'panel-' + cat.id;
+function buildCategoryBlock(cat){
+  const block = document.createElement('div');
 
   const banner = document.createElement('div');
   banner.className = 'category-banner';
   banner.innerHTML = '<span>' + cat.emoji + ' ' + cat.label.toUpperCase() + '</span>';
-  panel.appendChild(banner);
+  block.appendChild(banner);
 
   const grid = document.createElement('div');
   grid.className = 'item-grid';
@@ -470,7 +473,36 @@ MENU.forEach((cat, i) => {
     grid.appendChild(card);
   });
 
-  panel.appendChild(grid);
+  block.appendChild(grid);
+  return block;
+}
+
+// "الكل" tab first, then each category
+const allTab = document.createElement('button');
+allTab.className = 'tab active';
+allTab.textContent = '🍽️ الكل';
+allTab.dataset.id = 'all';
+allTab.onclick = () => selectTab('all');
+tabsEl.appendChild(allTab);
+
+const allPanel = document.createElement('div');
+allPanel.className = 'menu-panel active';
+allPanel.id = 'panel-all';
+MENU.forEach(cat => allPanel.appendChild(buildCategoryBlock(cat)));
+panelsEl.appendChild(allPanel);
+
+MENU.forEach((cat) => {
+  const tab = document.createElement('button');
+  tab.className = 'tab';
+  tab.textContent = cat.emoji + ' ' + cat.label;
+  tab.dataset.id = cat.id;
+  tab.onclick = () => selectTab(cat.id);
+  tabsEl.appendChild(tab);
+
+  const panel = document.createElement('div');
+  panel.className = 'menu-panel';
+  panel.id = 'panel-' + cat.id;
+  panel.appendChild(buildCategoryBlock(cat));
   panelsEl.appendChild(panel);
 });
 
@@ -593,6 +625,66 @@ function showToast(text){
 
 function scrollToTop(){ window.scrollTo({top:0, behavior:'smooth'}); }
 
+/* ---------- Reviews (customer-submitted) ---------- */
+const SEED_REVIEWS = [
+  { name:'عميل من المنطقة', rating:5, text:'البيتزا تحفة والخدمة ممتازة، والتوصيل بيوصل سخن دايمًا.' },
+  { name:'عميلة دايمة', rating:5, text:'بيتزا هارت بقت أول اختيار عندنا، خصوصًا برجر هارت والكريب.' },
+  { name:'عميل جديد', rating:4, text:'طعم مميز وأسعار كويسة، ونفسي يزودوا أصناف أكتر في السي فود.' },
+];
+
+function loadReviews(){
+  try {
+    const saved = JSON.parse(localStorage.getItem('pizzaHeartReviews') || '[]');
+    return SEED_REVIEWS.concat(saved);
+  } catch(e){ return SEED_REVIEWS; }
+}
+function saveReview(review){
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem('pizzaHeartReviews') || '[]'); } catch(e){}
+  saved.push(review);
+  localStorage.setItem('pizzaHeartReviews', JSON.stringify(saved));
+}
+
+function renderReviews(){
+  const grid = document.getElementById('reviewGrid');
+  const reviews = loadReviews();
+  grid.innerHTML = reviews.map(r => `
+    <div class="review-card reveal in">
+      <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+      <p>"${r.text}"</p>
+      <div class="who">— ${r.name || 'عميل'}</div>
+    </div>`).join('');
+}
+
+let selectedRating = 5;
+function renderStarPicker(){
+  const el = document.getElementById('starPicker');
+  el.innerHTML = [1,2,3,4,5].map(n =>
+    `<span data-n="${n}" style="color:${n <= selectedRating ? 'var(--gold)' : 'inherit'}" onclick="setRating(${n})">★</span>`
+  ).join('');
+}
+function setRating(n){ selectedRating = n; renderStarPicker(); }
+
+function openReviewModal(){
+  selectedRating = 5;
+  renderStarPicker();
+  document.getElementById('reviewName').value = '';
+  document.getElementById('reviewText').value = '';
+  document.getElementById('reviewModalOverlay').classList.add('open');
+}
+function closeReviewModal(){ document.getElementById('reviewModalOverlay').classList.remove('open'); }
+document.getElementById('reviewModalOverlay').addEventListener('click', e => { if (e.target.id === 'reviewModalOverlay') closeReviewModal(); });
+
+function submitReview(){
+  const text = document.getElementById('reviewText').value.trim();
+  if (!text){ showToast('من فضلك اكتب رأيك الأول'); return; }
+  const name = document.getElementById('reviewName').value.trim();
+  saveReview({ name, rating: selectedRating, text });
+  renderReviews();
+  closeReviewModal();
+  showToast('🙏 شكرًا لتقييمك!');
+}
+
 /* ---------- Scroll reveal ---------- */
 let observer;
 function observeReveals(){
@@ -604,6 +696,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.12 });
   observeReveals();
   renderCart();
+  renderReviews();
 });
 </script>
 
