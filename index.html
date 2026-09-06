@@ -625,18 +625,10 @@ function showToast(text){
 
 function scrollToTop(){ window.scrollTo({top:0, behavior:'smooth'}); }
 
-/* ---------- Reviews (customer-submitted) ---------- */
-const SEED_REVIEWS = [
-  { name:'عميل من المنطقة', rating:5, text:'البيتزا تحفة والخدمة ممتازة، والتوصيل بيوصل سخن دايمًا.' },
-  { name:'عميلة دايمة', rating:5, text:'بيتزا هارت بقت أول اختيار عندنا، خصوصًا برجر هارت والكريب.' },
-  { name:'عميل جديد', rating:4, text:'طعم مميز وأسعار كويسة، ونفسي يزودوا أصناف أكتر في السي فود.' },
-];
-
+/* ---------- Reviews (customer-submitted only) ---------- */
 function loadReviews(){
-  try {
-    const saved = JSON.parse(localStorage.getItem('pizzaHeartReviews') || '[]');
-    return SEED_REVIEWS.concat(saved);
-  } catch(e){ return SEED_REVIEWS; }
+  try { return JSON.parse(localStorage.getItem('pizzaHeartReviews') || '[]'); }
+  catch(e){ return []; }
 }
 function saveReview(review){
   let saved = [];
@@ -648,6 +640,10 @@ function saveReview(review){
 function renderReviews(){
   const grid = document.getElementById('reviewGrid');
   const reviews = loadReviews();
+  if (reviews.length === 0){
+    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:20px 0;">لسه مفيش تقييمات — كن أول واحد يشاركنا رأيه! ❤️</p>';
+    return;
+  }
   grid.innerHTML = reviews.map(r => `
     <div class="review-card reveal in">
       <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
